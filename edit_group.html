@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>竹蜻蜓</title>
+        <style>
+            :root { 
+                --top_bar_color: #30a0ff;
+            }
+
+            * {
+                box-sizing: border-box;
+            }
+
+            html, body {
+                margin: 0;          /* 去掉默认外边距 */
+                background-color: #f0f0f0; /* 可选：让背景与 main_bar 同色，消除视觉差异 */
+                height: 100%; 
+                overflow: hidden;
+            }
+
+            .top_bar {
+                background-color: var(--top_bar_color);
+                width: 100%;
+                height: 40px;
+                position: fixed;
+                top: 0;
+                left: 0;
+            }
+            .button_back {
+                background-color: var(--top_bar_color);
+                top: 0px;
+                border-width: 0;                
+                left: 0px;
+                width: 50px;
+                height: 40px;
+                position: absolute;
+                color: #ffffff;
+                font-size: 12px;
+                cursor: pointer;
+                &:hover {
+                    background-color: #70c0ff;
+                }
+            }
+            .button_setting {
+                background-color: var(--top_bar_color);
+                top: 0;
+                border-width: 0;                
+                right: 0;
+                width: 50px;
+                height: 40px;
+                position: absolute;
+                color: #ffffff;
+                font-size: 12px;
+                cursor: pointer;
+                &:hover {
+                    background-color: #70c0ff;
+                }
+            }
+
+            .main_bar{
+                
+                position: relative;
+                background-color: #ffffff;
+                top: 50px;
+                left: 100px;
+                width: calc(100% - 200px);
+                height: calc(100% - 50px);
+                padding: 100px;
+                padding-left: 100px;
+                padding-right: 100px;
+                overflow-y: auto;
+            }
+
+            .input_group_name {
+                width: 100%;
+                height: 40px;
+                padding: 20px;
+                border: 1px solid #ccc;
+                font-size: 15px;
+                &:focus {
+                    outline: none;                 /* 去掉默认的黑色轮廓 */
+                    border: 1px solid #ccc;     /* 换成你喜欢的颜色和粗细 */
+                    border-radius: 0px;            /* 圆角大小（可选） */
+                }
+            }
+
+            .line_separate {
+                height: 0;                  /* 线粗细 */
+                margin: 20px 0;               /* 上下间距，左右自动 */
+                border: 1px solid #f0f0f0;
+            }
+            
+            .button_edit_enter {
+                background-color: #ffffff;
+                top: 0;
+                border: 1px solid #ccc;
+                left: 0;
+                width: 100%;
+                height: 40px;
+                font-size: 15px;
+                cursor: pointer;
+                &:hover {
+                    background-color: #f0f0f0;
+                }
+            }
+
+        </style>
+    </head>
+    <body>
+
+        <div class="top_bar">
+            <button class="button_back" onclick="location.href='main'">返回</button>
+            <button class="button_setting" onclick="location.href='setting'">用户</button>
+        </div>
+
+        <div class="main_bar">              
+            <p>
+                <h2>群聊设置</h2>
+                <div class="line_separate"></div><br/> 
+
+                群聊名称<br/><br/>
+                <input class="input_group_name" type="text" placeholder="请输入群聊名称"><br/><br/>
+                <div class="line_separate"></div><br/>
+
+                <button class="button_edit_enter" onclick="location.href=''">编辑群成员</button><br/><br/>
+                <div class="line_separate"></div><br/>
+
+                <div class="option_area"></div>
+
+                <div id="displayData" style="white-space: pre-wrap; background: #f9f9f9; padding: 10px; border-radius: 5px;"></div>
+
+                <div id="path" style="white-space: pre-wrap; background: #ffffff; padding: 10px; border-radius: 5px;"></div>
+
+            </p>
+        </div>        
+
+        <script>
+            const user_verification_code = localStorage.getItem('user_verification_code');
+            const user_name = localStorage.getItem('user_name');
+            const user_id = localStorage.getItem('user_id');
+            const path = window.location.pathname;
+            const group_id = window.location.pathname.split('/').filter(Boolean).pop();
+            const main_bar = document.querySelector('.main_bar');
+            const option_area = document.querySelector('.option_area');
+
+            function createPermissionGroup(title, groupName) {
+                const container = document.createElement('div');
+                container.className = 'permission-group';
+
+                // 标题
+                const titleSpan = document.createElement('span');
+                titleSpan.textContent = title;
+                container.appendChild(titleSpan);
+                container.appendChild(document.createElement('br'));
+                container.appendChild(document.createElement('br'));
+
+                // 选项：所有人
+                const labelAll = document.createElement('label');
+                const radioAll = document.createElement('input');
+                radioAll.type = 'radio';
+                radioAll.name = groupName;
+                radioAll.value = 'all';
+                labelAll.appendChild(radioAll);
+                labelAll.appendChild(document.createTextNode(' 所有人'));
+                container.appendChild(labelAll);
+                container.appendChild(document.createTextNode(' ')); // 简单分隔
+
+                // 选项：部分人
+                const labelPart = document.createElement('label');
+                const radioPart = document.createElement('input');
+                radioPart.type = 'radio';
+                radioPart.name = groupName;
+                radioPart.value = 'part';
+                labelPart.appendChild(radioPart);
+                labelPart.appendChild(document.createTextNode(' 部分人'));
+                container.appendChild(labelPart);
+                container.appendChild(document.createElement('br'));
+                container.appendChild(document.createElement('br'));
+
+                // 分割线
+                const divider = document.createElement('div');
+                divider.className = 'line_separate';
+                container.appendChild(divider);
+                container.appendChild(document.createElement('br'));
+
+                return container;
+            }
+
+            option_area.appendChild(createPermissionGroup('哪些人可以搜索到该群聊：', 'not_kick_group'));
+            option_area.appendChild(createPermissionGroup('哪些非群成员也可以查看该群聊：', 'not_kick_group'));
+            option_area.appendChild(createPermissionGroup('哪些人禁止加入该群聊：', 'not_kick_group'));
+            option_area.appendChild(createPermissionGroup('哪些人不得被踢出该群聊：', 'not_kick_group'));
+            option_area.appendChild(createPermissionGroup('哪些人具有拉人进该群聊的权限：', 'not_kick_group'));
+            option_area.appendChild(createPermissionGroup('哪些人具有将群成员踢出该群聊的权限：', 'not_kick_group'));
+            option_area.appendChild(createPermissionGroup('哪些人具有修改“哪些人可以搜索到该群聊”的权限：', 'not_kick_group'));
+            option_area.appendChild(createPermissionGroup('哪些人具有修改群聊名称的权限：', 'not_kick_group'));
+
+            fetch('/get_group_permission', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_name: user_name,
+                    user_verification_code: user_verification_code,
+                    user_id: user_id,
+                    group_id: group_id
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('服务器返回:', data);
+                document.getElementById('displayData').innerText = JSON.stringify(data, null, 2);
+            })
+            .catch(error => console.error('错误:', error));
+
+            document.getElementById('path').innerText = group_id;
+
+        </script>
+
+    </body>
+</html>
