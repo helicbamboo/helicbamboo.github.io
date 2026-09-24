@@ -5,8 +5,8 @@
   --accent: #46c4bf;
   --accent-dark: #158a86;
   --green-cyan: #e9f7f0;
-  --teal-cyan: #e0f0f2;
-  --panel-cyan: #f8fbfb;
+  --teal-cyan: #d8eef0;
+  --panel-cyan: #eef8f7;
 }
 
 * {
@@ -149,7 +149,7 @@ body {
   display: grid;
   grid-template-columns: 220px 1fr;
   gap: 24px;
-  align-items: baseline;
+  align-items: center;
   padding: 28px;
   background: var(--panel-cyan);
 }
@@ -164,8 +164,14 @@ body {
   font-size: 1.15rem;
 }
 
-.project p {
-  margin: 0 0 16px;
+.project-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.project-title p {
+  margin: 8px 0 0;
   color: var(--muted);
 }
 
@@ -275,6 +281,10 @@ body {
     grid-template-columns: 1fr;
     gap: 16px;
     padding: 24px;
+  }
+
+  .project-content {
+    align-items: flex-start;
   }
 
   .friend-link {
