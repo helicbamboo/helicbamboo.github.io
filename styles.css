@@ -154,6 +154,11 @@ body {
   background: var(--panel-cyan);
 }
 
+.project-list {
+  display: grid;
+  gap: 16px;
+}
+
 .project h3 {
   margin: 0;
   font-size: 1.15rem;
